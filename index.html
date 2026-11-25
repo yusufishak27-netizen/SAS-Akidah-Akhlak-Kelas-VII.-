@@ -788,5 +788,28 @@
         switchScreen('result-screen');
     }
 </script>
+    <script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTkJMFu09lpk5_XI74vKA1nSDdW-6RH8p1UhYEl5HXKJtAp_Ul0DtblwI0wHzPilsEhg/exec";
+function kirimKeSheet(){
+  try{
+    let namaEl = document.querySelector('input[placeholder*="Nama" i], #nama, #student-name, #input-nama');
+    let kelasEl = document.querySelector('input[placeholder*="Kelas" i], #kelas, #student-class');
+    let nama = namaEl ? namaEl.value : (localStorage.getItem('nama') || "Tanpa Nama");
+    let kelas = kelasEl ? kelasEl.value : (localStorage.getItem('kelas') || "");
+    let nilai = document.getElementById('final-score') ? document.getElementById('final-score').innerText : "";
+    let pgBenar = document.getElementById('pg-correct') ? document.getElementById('pg-correct').innerText : "0";
+    let isianBenar = document.getElementById('isian-correct') ? document.getElementById('isian-correct').innerText : "0";
+    let benar = (parseInt(pgBenar)||0) + (parseInt(isianBenar)||0);
+    fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({nama:nama,kelas:kelas,nilai:nilai,benar:benar,salah:""})});
+  }catch(e){}
+}
+// Kirim 1 detik setelah hasil muncul
+let cek = setInterval(function(){
+  let hasil = document.getElementById('result-screen');
+  if(hasil && hasil.style.display !== 'none' && hasil.offsetParent !== null){
+    kirimKeSheet(); clearInterval(cek);
+  }
+}, 1000);
+</script>
 </body>
 </html>
