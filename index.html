@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Interaktif - Asesmen Akidah Akhlak</title>
+    <style>
+        :root {
+            --primary-color: #047857;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --bg-color: #ecfdf5;
+            --text-color: #1f2937;
+            --light-bg: #ffffff;
+            --border-color: #d1d5db;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--light-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            margin: 20px;
+        }
+
+        /* Float Developer Info */
+        .dev-info-float {
+            position: absolute;
+            top: 20px;
+            right: -10px;
+            background: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px 0 0 20px;
+            font-size: 0.85rem;
+            box-shadow: -2px 2px 10px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .dev-info-float h4 { margin-bottom: 3px; font-size: 0.9rem;}
+        .dev-info-float p { margin: 0; font-size: 0.75rem;}
+
+        /* Screens */
+        .screen {
+            display: none;
+            padding: 40px;
+            flex-direction: column;
+            min-height: 500px;
+        }
+        .screen.active {
+            display: flex;
+        }
+
+        /* Cover Screen */
+        #cover-screen {
+            justify-content: center;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #d1fae5 100%);
+        }
+        .cover-header { text-align: center; margin-bottom: 20px; }
+        .cover-title { font-size: 2.2rem; color: var(--primary-color); margin-bottom: 10px; }
+        .cover-subtitle { font-size: 1.2rem; color: #4b5563; margin-bottom: 10px; }
+        
+        .instructions-box {
+            background: #fffbeb;
+            border-left: 5px solid var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .instructions-box h3 { color: #b45309; margin-bottom: 10px; font-size: 1.1rem; }
+        .instructions-box ol { margin-left: 20px; }
+        .instructions-box li { margin-bottom: 5px; }
+
+        .student-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-weight: bold; color: var(--primary-color); font-size: 0.95rem; }
+        .form-input {
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-input:focus { border-color: var(--primary-color); }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 1.05rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+        }
+        .btn:hover { background-color: #065f46; }
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            width: auto;
+        }
+        .btn-outline:hover { background-color: var(--bg-color); }
+        .btn-nav { width: auto; }
+
+        /* Quiz Header */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .progress-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Question Content */
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        /* Options */
+        .options-container { display: flex; flex-direction: column; gap: 12px; }
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-label:hover {
+            border-color: var(--secondary-color);
+            background-color: #f3f4f6;
+        }
+        .option-label input {
+            margin-top: 5px;
+            margin-right: 15px;
+            accent-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+        .option-label.selected {
+            border-color: var(--primary-color);
+            background-color: #e6f6f2;
+        }
+
+        /* Input for Isian */
+        .input-isian {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .input-isian:focus { border-color: var(--primary-color); }
+
+        /* Navigation Controls */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Report Screen */
+        .report-header { text-align: center; margin-bottom: 30px; }
+        .student-result-info {
+            background: #e5e7eb;
+            padding: 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary-color) 0%, var(--primary-color) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(4, 120, 87, 0.3);
+        }
+        .score-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .score-box {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #d1fae5;
+        }
+        .locked-msg {
+            color: #dc2626;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: #fee2e2;
+            border-radius: 6px;
+        }
+
+        /* Kop Laporan Print */
+        #print-header {
+            display: none;
+            text-align: center;
+            border-bottom: 3px solid black;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        #print-header h1 { font-size: 1.5rem; text-transform: uppercase; margin-bottom: 5px; }
+        #print-header h2 { font-size: 1.2rem; font-weight: normal; margin-bottom: 15px;}
+        #print-header p { font-size: 0.9rem; margin-bottom: 3px;}
+        .print-student-data {
+            text-align: left;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        @media print {
+            body { background: white; align-items: flex-start; padding: 0; }
+            .container { box-shadow: none; margin: 0; width: 100%; max-width: 100%; border-radius: 0; }
+            .dev-info-float, .btn, .nav-controls, .locked-msg { display: none !important; }
+            .screen { padding: 0; min-height: auto; }
+            #print-header { display: block; }
+            .score-circle { border: 5px solid black; background: white; color: black; box-shadow: none; }
+            .score-box { border: 1px solid black; background: white; }
+        }
+
+        @media (max-width: 600px) {
+            .screen { padding: 20px; }
+            .dev-info-float { top: 0; right: 0; border-radius: 0 0 0 10px; padding: 5px 10px;}
+            .score-details { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- Floating Dev Info (Visible on Cover) -->
+    <div class="dev-info-float" id="dev-float">
+        <h4>Sri Alissa Geanti Amango, S.Pd., Gr.</h4>
+        <p>MTs N 1 Gorontalo Utara</p>
+    </div>
+
+    <!-- Kop for PDF Print -->
+    <div id="print-header">
+        <h1>Laporan Hasil Asesmen Akhir Semester</h1>
+        <h2>Mata Pelajaran Akidah Akhlak - Kelas VII / Fase D</h2>
+        <p>Pengembang MPI: Sri Alissa Geanti Amango, S.Pd., Gr. | MTs Negeri 1 Gorontalo Utara</p>
+        <p>Email: srialissageantiamango15@gmail.com</p>
+        <div class="print-student-data">
+            <p>Nama Lengkap : <span id="print-nama"></span></p>
+            <p>Kelas / Fase : <span id="print-kelas"></span></p>
+        </div>
+    </div>
+
+    <!-- SCREEN 1: COVER & FORM -->
+    <div id="cover-screen" class="screen active">
+        <div class="cover-header">
+            <h1 class="cover-title">Asesmen Akhir Semester</h1>
+            <h2 class="cover-subtitle">Mata Pelajaran Akidah Akhlak</h2>
+        </div>
+
+        <div class="instructions-box">
+            <h3>Petunjuk Pengisian:</h3>
+            <ol>
+                <li>Isilah <b>Nama Lengkap</b> dan <b>Kelas</b> Anda pada kolom di bawah ini.</li>
+                <li>Bacalah setiap soal dengan cermat dan teliti.</li>
+                <li>Pilih satu jawaban yang paling tepat untuk soal Pilihan Ganda.</li>
+                <li>Ketikkan <b>satu kata</b> yang paling tepat untuk soal Isian Singkat.</li>
+                <li>Pastikan semua soal telah terjawab sebelum menekan tombol "Selesai & Hitung Nilai".</li>
+                <li><b>PENTING:</b> Asesmen ini hanya dapat dikerjakan <b>satu kali</b>. Setelah menekan selesai, Anda tidak diizinkan mengulangi soal kembali.</li>
+            </ol>
+        </div>
+        
+        <div class="student-form">
+            <div class="form-group">
+                <label for="input-nama">Nama Lengkap Siswa</label>
+                <input type="text" id="input-nama" class="form-input" placeholder="Masukkan nama lengkap Anda..." required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="input-kelas">Kelas</label>
+                <input type="text" id="input-kelas" class="form-input" placeholder="Contoh: VII-A" required autocomplete="off">
+            </div>
+        </div>
+        
+        <button class="btn" onclick="startQuiz()">Mulai Asesmen Sekarang</button>
+    </div>
+
+    <!-- SCREEN 2: QUIZ INTERFACE -->
+    <div id="quiz-screen" class="screen">
+        <div class="quiz-header">
+            <div>
+                <span class="progress-badge" id="question-counter">Soal 1 / 20</span>
+                <span style="margin-left:10px; font-weight:600; color:#4b5563;" id="question-type-badge">Pilihan Ganda</span>
+            </div>
+            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.85rem;" onclick="finishQuizEarly()">Kumpulkan Selesai</button>
+        </div>
+        
+        <div id="question-container">
+            <div class="question-text" id="q-text">Teks Soal Akan Muncul Di Sini</div>
+            <div id="input-area"></div>
+        </div>
+
+        <div class="nav-controls">
+            <button class="btn btn-outline btn-nav" id="btn-prev" onclick="prevQuestion()">&laquo; Sebelumnya</button>
+            <button class="btn btn-nav" id="btn-next" onclick="nextQuestion()">Selanjutnya &raquo;</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: RESULT REPORT -->
+    <div id="result-screen" class="screen">
+        <div class="report-header">
+            <h2>Laporan Hasil Asesmen</h2>
+            <p>Terima kasih telah menyelesaikan asesmen Akidah Akhlak.</p>
+            <div class="student-result-info">
+                <span id="res-nama"></span> - <span id="res-kelas"></span>
+            </div>
+        </div>
+
+        <div class="score-circle" id="final-score">0</div>
+        <p style="text-align: center; font-weight: bold; margin-bottom: 20px;">NILAI AKHIR</p>
+
+        <div class="score-details">
+            <div class="score-box">
+                <h3>Pilihan Ganda</h3>
+                <p>Benar: <span id="pg-correct">0</span>/15</p>
+                <p>Poin: <span id="pg-score">0</span> (Maks. 60)</p>
+            </div>
+            <div class="score-box">
+                <h3>Isian Singkat</h3>
+                <p>Benar: <span id="isian-correct">0</span>/5</p>
+                <p>Poin: <span id="isian-score">0</span> (Maks. 40)</p>
+            </div>
+        </div>
+
+        <div class="locked-msg" id="locked-message" style="display: none;">
+            Asesmen telah diselesaikan. Anda tidak diizinkan untuk mengulangi soal.
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <!-- Tombol "Ulangi Asesmen" dihapus sesuai permintaan agar siswa tidak bisa mengulang -->
+            <button class="btn" style="width: auto; padding: 12px 30px;" onclick="window.print()">Cetak Laporan PDF</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // DATA SOAL BERDASARKAN DOKUMEN[cite: 1]
+    const questions = [
+        // BAGIAN A: PILIHAN GANDA
+        {
+            id: 1, type: 'pg',
+            text: "Ahmad melaksanakan salat berjamaah di masjid. Ketika salat berlangsung, ia melihat temannya datang terlambat dan memberikan isyarat agar temannya segera mengisi saf di sampingnya. Setelah salat, Ahmad menyadari bahwa ia sempat melakukan gerakan yang tidak diperlukan. Berdasarkan peristiwa tersebut, sikap yang paling tepat dalam menjaga adab salat adalah ....",
+            options: {
+                A: "Mengutamakan perhatian kepada orang yang datang karena membantu sesama lebih penting daripada kekhusyukan.",
+                B: "Menjaga kekhusyukan dan menghindari gerakan yang tidak diperlukan, serta tetap memperhatikan ketertiban saf sesuai ketentuan salat.",
+                C: "Menghentikan salat sejenak agar dapat membantu temannya mengatur posisi saf.",
+                D: "Mengulangi seluruh gerakan salat setiap kali merasa perhatiannya terganggu."
+            }, answer: "B"
+        },
+        {
+            id: 2, type: 'pg',
+            text: "Seseorang rajin berzikir setelah salat dengan jumlah bacaan yang banyak. Akan tetapi, ia sering merendahkan orang lain yang jumlah zikirnya lebih sedikit dan menganggap ibadahnya paling baik. Analisis yang paling tepat terhadap perilaku tersebut adalah ....",
+            options: {
+                A: "Perilakunya benar karena banyaknya zikir menunjukkan tingkat keimanan seseorang.",
+                B: "Perilakunya dapat dibenarkan selama bacaan zikirnya sesuai dengan tuntunan agama.",
+                C: "Perilakunya kurang tepat karena zikir seharusnya membentuk kerendahan hati, bukan menumbuhkan kesombongan.",
+                D: "Perilakunya tidak menjadi masalah karena zikir merupakan hubungan pribadi antara manusia dan Allah."
+            }, answer: "C"
+        },
+        {
+            id: 3, type: 'pg',
+            text: "Perhatikan beberapa perilaku berikut!<br>(1) Membaca Al-Qur’an dengan memperhatikan makhraj dan tajwid.<br>(2) Menyimpan mushaf di tempat yang bersih dan terhormat.<br>(3) Membaca Al-Qur’an dengan cepat agar segera menyelesaikan satu juz.<br>(4) Memahami dan berusaha mengamalkan kandungan ayat yang dibaca.<br>(5) Membaca Al-Qur’an sambil melakukan percakapan yang tidak berkaitan dengannya.<br>Kombinasi perilaku yang paling mencerminkan adab membaca Al-Qur’an secara menyeluruh adalah ....",
+            options: {
+                A: "1, 2, dan 4", B: "1, 3, dan 5", C: "2, 3, dan 4", D: "3, 4, dan 5"
+            }, answer: "A"
+        },
+        {
+            id: 4, type: 'pg',
+            text: "Fatimah telah berdoa berkali-kali agar memperoleh hasil terbaik dalam ujian. Namun, hasil yang diperolehnya belum sesuai harapan. Ia kemudian merasa bahwa Allah tidak mengabulkan doanya. Berdasarkan pemahaman tentang adab berdoa, nasihat yang paling tepat untuk Fatimah adalah ....",
+            options: {
+                A: "Berhenti berdoa karena doa yang tidak segera terkabul menunjukkan permintaan yang tidak sesuai.",
+                B: "Mengulangi doa dengan suara lebih keras agar Allah segera mengabulkannya.",
+                C: "Menganggap doa tidak lagi diperlukan karena hasil akhir hanya ditentukan oleh usaha.",
+                D: "Tetap berdoa, bersabar, berikhtiar, dan berprasangka baik kepada Allah karena pengabulan doa dapat terjadi dengan cara dan waktu yang tidak selalu sesuai keinginan manusia."
+            }, answer: "D"
+        },
+        {
+            id: 5, type: 'pg',
+            text: "Dalam sebuah kegiatan keagamaan, terdapat dua orang murid. Murid pertama membaca Al-Qur’an dengan suara merdu, tetapi sering mengabaikan makna dan pesan ayatnya. Murid kedua membaca dengan sederhana, berusaha memahami maknanya, dan menerapkannya dalam kehidupan. Penilaian yang paling tepat adalah ....",
+            options: {
+                A: "Murid pertama lebih baik karena keindahan suara merupakan ukuran utama adab membaca Al-Qur’an.",
+                B: "Murid kedua menunjukkan penghayatan yang lebih menyeluruh karena menggabungkan bacaan, pemahaman, dan pengamalan.",
+                C: "Keduanya tidak menunjukkan adab karena membaca Al-Qur’an harus selalu dengan suara merdu.",
+                D: "Murid pertama lebih baik karena jumlah bacaan lebih penting daripada pengamalan."
+            }, answer: "B"
+        },
+        {
+            id: 6, type: 'pg',
+            text: "Seorang anak mendapatkan nasihat dari orang tuanya agar tidak terlalu sering bermain telepon genggam. Ia merasa nasihat tersebut membatasi kebebasannya. Dalam perspektif adab kepada orang tua, tindakan paling tepat adalah ....",
+            options: {
+                A: "Mengabaikan nasihat karena setiap anak berhak menentukan seluruh kegiatannya sendiri.",
+                B: "Membantah dengan keras agar orang tua memahami keinginannya.",
+                C: "Mendengarkan nasihat dengan hormat, menyampaikan pendapat secara santun, dan berusaha mencari kesepakatan yang baik.",
+                D: "Menuruti nasihat di hadapan orang tua, tetapi tetap melakukan hal yang sama secara diam-diam."
+            }, answer: "C"
+        },
+        {
+            id: 7, type: 'pg',
+            text: "Seorang murid mengetahui bahwa gurunya melakukan kesalahan dalam menjelaskan suatu materi. Ia ingin meluruskan kesalahan tersebut agar tidak menimbulkan kesalahpahaman bagi teman-temannya. Cara yang paling mencerminkan adab kepada guru adalah ....",
+            options: {
+                A: "Menyela penjelasan guru dan menyatakan bahwa guru tersebut salah.",
+                B: "Menyebarkan kesalahan guru kepada teman agar mereka mengetahui kekeliruannya.",
+                C: "Membiarkan kesalahan tersebut karena murid tidak diperbolehkan mengoreksi guru.",
+                D: "Menyampaikan pendapat dengan bahasa santun, disertai alasan atau sumber yang tepat, pada waktu dan cara yang sesuai."
+            }, answer: "D"
+        },
+        {
+            id: 8, type: 'pg',
+            text: "Dalam sebuah kelompok belajar, salah satu anggota tidak menyelesaikan tugas yang menjadi tanggung jawabnya. Anggota lainnya merasa dirugikan. Jika dikaitkan dengan adab kepada saudara dan teman, penyelesaian yang paling tepat adalah ....",
+            options: {
+                A: "Mengajak anggota tersebut berdiskusi, mencari penyebab masalah, membagi ulang tugas jika diperlukan, dan tetap mengingatkan tanggung jawabnya.",
+                B: "Mengeluarkannya dari kelompok tanpa memberikan kesempatan menjelaskan.",
+                C: "Menyelesaikan seluruh tugasnya dan membiarkan kebiasaan tersebut berulang.",
+                D: "Mempermalukannya di depan kelas agar ia merasa jera."
+            }, answer: "A"
+        },
+        {
+            id: 9, type: 'pg',
+            text: "Seorang tetangga sering memutar musik dengan suara keras hingga mengganggu waktu istirahat warga lainnya. Beberapa warga ingin membalas dengan melakukan hal serupa. Berdasarkan adab kepada tetangga, tindakan yang paling bijaksana adalah ....",
+            options: {
+                A: "Membalas dengan suara yang lebih keras agar tetangga menyadari kesalahannya.",
+                B: "Menegur secara baik-baik dan mengutamakan musyawarah untuk memperoleh penyelesaian tanpa memperkeruh hubungan.",
+                C: "Menyebarkan keburukan tetangga tersebut kepada seluruh warga.",
+                D: "Membiarkan permasalahan karena menjaga hubungan tetangga berarti tidak boleh memberikan teguran."
+            }, answer: "B"
+        },
+        {
+            id: 10, type: 'pg',
+            text: "Ketika berjalan di lingkungan madrasah, seorang murid melihat sampah di tengah jalan. Pada saat yang sama, ia sedang terburu-buru menuju kelas. Ia juga melihat seorang murid lain hampir terpeleset karena sampah tersebut. Tindakan yang paling sesuai dengan adab berjalan dan kepedulian sosial adalah ....",
+            options: {
+                A: "Tetap berjalan karena kebersihan merupakan tanggung jawab petugas kebersihan.",
+                B: "Menegur murid lain agar mengambil sampah tersebut.",
+                C: "Menghindari sampah dan melanjutkan perjalanan tanpa memperhatikan orang lain.",
+                D: "Mengamankan sampah agar tidak membahayakan orang lain, kemudian membuangnya pada tempat yang semestinya."
+            }, answer: "D"
+        },
+        {
+            id: 11, type: 'pg',
+            text: "Dalam sebuah acara resmi madrasah, seorang murid mengenakan pakaian yang mahal dan mengikuti tren terbaru. Namun, pakaian tersebut transparan dan tidak memenuhi ketentuan menutup aurat. Berdasarkan prinsip adab berpakaian dalam Islam, penilaian yang paling tepat adalah ....",
+            options: {
+                A: "Pakaian tersebut tetap baik karena kebersihan dan keindahan merupakan hal utama.",
+                B: "Pakaian tersebut dapat diterima selama digunakan dalam acara resmi.",
+                C: "Pakaian tersebut tidak sesuai dengan adab Islam karena penampilan menarik harus tetap memperhatikan ketentuan menutup aurat dan kesopanan.",
+                D: "Pakaian tersebut benar karena mengikuti perkembangan zaman merupakan bagian dari kehidupan sosial."
+            }, answer: "C"
+        },
+        {
+            id: 12, type: 'pg',
+            text: "Dalam sebuah grup media sosial kelas, seorang murid mengunggah foto temannya tanpa izin dan menambahkan keterangan yang mempermalukannya. Ketika ditegur, ia mengatakan bahwa unggahan tersebut hanya bercanda. Analisis yang paling tepat adalah ....",
+            options: {
+                A: "Perbuatan tersebut tetap tidak sesuai dengan adab karena dapat melanggar privasi, merendahkan kehormatan, dan menyakiti perasaan orang lain.",
+                B: "Perbuatan tersebut dibenarkan karena dilakukan dalam grup yang hanya berisi teman sekelas.",
+                C: "Perbuatan tersebut tidak menjadi masalah apabila foto yang diunggah benar-benar milik temannya.",
+                D: "Perbuatan tersebut dapat diterima selama sebagian anggota grup menganggapnya lucu."
+            }, answer: "A"
+        },
+        {
+            id: 13, type: 'pg',
+            text: "Perhatikan beberapa tindakan berikut!<br>(1) Memeriksa sumber berita sebelum membagikannya.<br>(2) Menghapus komentar yang berbeda pendapat dengan dirinya.<br>(3) Menghindari penyebaran informasi yang mengandung fitnah.<br>(4) Menjaga bahasa ketika memberikan kritik.<br>(5) Membagikan informasi pribadi orang lain tanpa persetujuan.<br>Tindakan yang mencerminkan penerapan adab bersosial media adalah ....",
+            options: {
+                A: "1, 2, dan 5", B: "1, 3, dan 4", C: "2, 3, dan 5", D: "2, 4, dan 5"
+            }, answer: "B"
+        },
+        {
+            id: 14, type: 'pg',
+            text: "Rina menerima pesan dari akun yang tidak dikenal. Pesan tersebut berisi tuduhan bahwa salah satu gurunya melakukan tindakan buruk. Pesan itu juga meminta Rina segera menyebarkannya kepada seluruh teman. Jika dikaitkan dengan prinsip memeriksa kebenaran informasi, tindakan yang paling tepat adalah ....",
+            options: {
+                A: "Menyebarkan pesan tersebut dengan menyertakan keterangan bahwa informasi belum pasti.",
+                B: "Mempercayainya karena pesan tersebut disampaikan dengan sangat meyakinkan.",
+                C: "Mengabaikannya, tetapi tetap menceritakan isi pesan kepada teman dekat.",
+                D: "Tidak menyebarkannya, memeriksa kebenaran melalui sumber yang dapat dipercaya, dan menjaga kehormatan pihak yang diberitakan."
+            }, answer: "D"
+        },
+        {
+            id: 15, type: 'pg',
+            text: "Seorang murid dikenal rajin beribadah, tetapi dalam kehidupan sehari-hari ia sering menghina teman, membantah orang tua, dan menyebarkan berita yang belum jelas kebenarannya. Kesimpulan yang paling tepat berdasarkan hubungan antara adab beribadah dan adab sosial adalah ....",
+            options: {
+                A: "Ibadah tidak memiliki hubungan dengan perilaku seseorang dalam kehidupan sosial.",
+                B: "Kesalahan dalam pergaulan dapat diabaikan selama seseorang rajin melaksanakan ibadah.",
+                C: "Ibadah seharusnya membentuk akhlak yang baik, sehingga seseorang perlu memperbaiki kualitas ibadah sekaligus perilakunya terhadap sesama.",
+                D: "Perilaku sosial lebih penting daripada ibadah sehingga ibadah tidak perlu diperhatikan."
+            }, answer: "C"
+        },
+
+        // BAGIAN B: ISIAN SINGKAT
+        {
+            id: 16, type: 'isian',
+            text: "Seseorang melaksanakan salat dengan gerakan yang benar, tetapi pikirannya selalu tertuju pada urusan dunia sehingga tidak memperhatikan bacaan dan gerakan salatnya. Sikap yang seharusnya dijaga agar seseorang dapat lebih menghayati salat adalah ....",
+            answer: "khusyuk"
+        },
+        {
+            id: 17, type: 'isian',
+            text: "Seorang murid berdoa sebelum ujian, tetapi ia tidak belajar dan hanya mengandalkan permohonannya kepada Allah Swt. Agar doanya disertai usaha nyata, ia harus melakukan ....",
+            answer: "belajar"
+        },
+        {
+            id: 18, type: 'isian',
+            text: "Ketika guru sedang menjelaskan pelajaran, seorang murid menemukan informasi yang berbeda dari penjelasan guru. Sebelum menyampaikan pendapatnya, ia seharusnya mendengarkan penjelasan guru dengan penuh ....",
+            answer: "perhatian"
+        },
+        {
+            id: 19, type: 'isian',
+            text: "Seorang anak tidak setuju dengan keputusan orang tuanya. Namun, ia tetap menyampaikan pendapat menggunakan bahasa yang halus dan tidak meninggikan suara. Cara berbicara tersebut mencerminkan sikap ....",
+            answer: "sopan"
+        },
+        {
+            id: 20, type: 'isian',
+            text: "Seorang murid menerima unggahan yang berisi penghinaan terhadap temannya. Meskipun banyak orang menyukai unggahan tersebut, ia tidak ikut menyebarkannya karena ingin menjaga ....",
+            answer: "kehormatan"
+        }
+    ];
+
+    let currentIndex = 0;
+    let userAnswers = {};
+    let studentName = "";
+    let studentClass = "";
+
+    // Mencegah siswa mengulang: Mengecek localStorage saat halaman pertama dimuat
+    window.onload = function() {
+        if (localStorage.getItem('akidah_akhlak_completed') === 'true') {
+            loadResultFromStorage();
+        } else {
+            switchScreen('cover-screen');
+        }
+    };
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        
+        // Hide floating dev info if not on cover
+        document.getElementById('dev-float').style.display = (screenId === 'cover-screen') ? 'block' : 'none';
+    }
+
+    function startQuiz() {
+        const inputNama = document.getElementById('input-nama').value.trim();
+        const inputKelas = document.getElementById('input-kelas').value.trim();
+
+        if (inputNama === "" || inputKelas === "") {
+            alert("Silakan isi Nama Lengkap dan Kelas terlebih dahulu sebelum memulai asesmen!");
+            return;
+        }
+
+        studentName = inputNama;
+        studentClass = inputKelas;
+        
+        // Memasukkan data ke tampilan result (DOM)
+        document.getElementById('res-nama').innerText = studentName;
+        document.getElementById('res-kelas').innerText = studentClass;
+        document.getElementById('print-nama').innerText = studentName;
+        document.getElementById('print-kelas').innerText = studentClass;
+
+        currentIndex = 0;
+        userAnswers = {};
+        switchScreen('quiz-screen');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = questions[currentIndex];
+        
+        document.getElementById('question-counter').innerText = `Soal ${currentIndex + 1} / ${questions.length}`;
+        document.getElementById('question-type-badge').innerText = q.type === 'pg' ? 'Pilihan Ganda' : 'Isian Singkat (1 Kata)';
+        document.getElementById('q-text').innerHTML = `${currentIndex + 1}. ${q.text}`;
+        
+        const inputArea = document.getElementById('input-area');
+        inputArea.innerHTML = ''; 
+
+        if (q.type === 'pg') {
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container';
+            
+            for (const [key, val] of Object.entries(q.options)) {
+                const label = document.createElement('label');
+                label.className = `option-label ${userAnswers[q.id] === key ? 'selected' : ''}`;
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `question_${q.id}`;
+                radio.value = key;
+                if (userAnswers[q.id] === key) radio.checked = true;
+                
+                radio.onchange = (e) => {
+                    userAnswers[q.id] = e.target.value;
+                    renderQuestion(); // Re-render to update styling
+                };
+
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(`${key}. ${val}`));
+                optionsContainer.appendChild(label);
+            }
+            inputArea.appendChild(optionsContainer);
+        } else {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'input-isian';
+            input.placeholder = 'Ketik jawaban (1 kata)...';
+            if (userAnswers[q.id]) input.value = userAnswers[q.id];
+            
+            input.oninput = (e) => {
+                userAnswers[q.id] = e.target.value;
+            };
+            inputArea.appendChild(input);
+        }
+
+        // Setup Buttons
+        document.getElementById('btn-prev').disabled = currentIndex === 0;
+        
+        const btnNext = document.getElementById('btn-next');
+        if (currentIndex === questions.length - 1) {
+            btnNext.innerText = "Selesai & Hitung Nilai";
+            btnNext.onclick = calculateResult;
+            btnNext.style.backgroundColor = 'var(--accent-color)';
+        } else {
+            btnNext.innerText = "Selanjutnya \u00BB";
+            btnNext.onclick = nextQuestion;
+            btnNext.style.backgroundColor = 'var(--primary-color)';
+        }
+    }
+
+    function nextQuestion() {
+        if (currentIndex < questions.length - 1) {
+            currentIndex++;
+            renderQuestion();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderQuestion();
+        }
+    }
+
+    function finishQuizEarly() {
+        if(confirm("Apakah Anda yakin ingin menyelesaikan dan mengumpulkan asesmen sekarang? Ingat, Anda tidak bisa mengulangi asesmen ini!")) {
+            calculateResult();
+        }
+    }
+
+    function calculateResult() {
+        let pgCorrect = 0;
+        let isianCorrect = 0;
+
+        questions.forEach(q => {
+            const userAnswer = userAnswers[q.id];
+            if (!userAnswer) return;
+
+            if (q.type === 'pg') {
+                if (userAnswer === q.answer) pgCorrect++;
+            } else if (q.type === 'isian') {
+                const cleanAns = userAnswer.toString().trim().toLowerCase();
+                if (cleanAns === q.answer.toLowerCase()) isianCorrect++;
+            }
+        });
+
+        // Skor (PG: 4 poin, Isian: 8 poin)[cite: 1]
+        const pgScore = pgCorrect * 4;
+        const isianScore = isianCorrect * 8;
+        const totalScore = pgScore + isianScore;
+
+        // Menyimpan status selesai ke LocalStorage agar siswa tidak bisa mengulang
+        localStorage.setItem('akidah_akhlak_completed', 'true');
+        localStorage.setItem('akidah_akhlak_nama', studentName);
+        localStorage.setItem('akidah_akhlak_kelas', studentClass);
+        localStorage.setItem('akidah_akhlak_pg_correct', pgCorrect);
+        localStorage.setItem('akidah_akhlak_pg_score', pgScore);
+        localStorage.setItem('akidah_akhlak_isian_correct', isianCorrect);
+        localStorage.setItem('akidah_akhlak_isian_score', isianScore);
+        localStorage.setItem('akidah_akhlak_total', totalScore);
+
+        displayResult(pgCorrect, pgScore, isianCorrect, isianScore, totalScore);
+    }
+
+    function loadResultFromStorage() {
+        studentName = localStorage.getItem('akidah_akhlak_nama');
+        studentClass = localStorage.getItem('akidah_akhlak_kelas');
+        const pgCorrect = localStorage.getItem('akidah_akhlak_pg_correct');
+        const pgScore = localStorage.getItem('akidah_akhlak_pg_score');
+        const isianCorrect = localStorage.getItem('akidah_akhlak_isian_correct');
+        const isianScore = localStorage.getItem('akidah_akhlak_isian_score');
+        const totalScore = localStorage.getItem('akidah_akhlak_total');
+
+        document.getElementById('res-nama').innerText = studentName;
+        document.getElementById('res-kelas').innerText = studentClass;
+        document.getElementById('print-nama').innerText = studentName;
+        document.getElementById('print-kelas').innerText = studentClass;
+        
+        // Tampilkan pesan peringatan karena masuk melalui reload
+        document.getElementById('locked-message').style.display = 'block';
+
+        displayResult(pgCorrect, pgScore, isianCorrect, isianScore, totalScore);
+    }
+
+    function displayResult(pgCorrect, pgScore, isianCorrect, isianScore, totalScore) {
+        document.getElementById('pg-correct').innerText = pgCorrect;
+        document.getElementById('pg-score').innerText = pgScore;
+        document.getElementById('isian-correct').innerText = isianCorrect;
+        document.getElementById('isian-score').innerText = isianScore;
+        document.getElementById('final-score').innerText = totalScore;
+
+        // Ganti warna berdasarkan KKM (misal batas 70)
+        const scoreCircle = document.getElementById('final-score');
+        if(parseInt(totalScore) < 70) {
+            scoreCircle.style.background = 'conic-gradient(#ef4444 0%, #ef4444 100%)';
+            scoreCircle.style.boxShadow = '0 5px 15px rgba(239, 68, 68, 0.3)';
+        } else {
+            scoreCircle.style.background = 'conic-gradient(var(--primary-color) 0%, var(--primary-color) 100%)';
+            scoreCircle.style.boxShadow = '0 5px 15px rgba(4, 120, 87, 0.3)';
+        }
+
+        switchScreen('result-screen');
+    }
+</script>
+</body>
+</html>
