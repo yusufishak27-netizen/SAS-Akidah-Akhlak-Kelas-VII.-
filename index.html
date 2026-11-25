@@ -792,8 +792,8 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTkJMFu09lpk5_XI74vKA1nSDdW-6RH8p1UhYEl5HXKJtAp_Ul0DtblwI0wHzPilsEhg/exec";
 function kirimKeSheet(){
   try{
-    let namaEl = document.querySelector('input[placeholder*="Nama" i], #nama, #student-name, #input-nama');
-    let kelasEl = document.querySelector('input[placeholder*="Kelas" i], #kelas, #student-class');
+    let namaEl = document.querySelector('input[placeholder*-="nama" i], #nama, #student-name, #input-nama');
+    let kelasEl = document.querySelector('input[placeholder*="kelas" i], #kelas, #student-class');
     let nama = namaEl ? namaEl.value : (localStorage.getItem('nama') || "Tanpa Nama");
     let kelas = kelasEl ? kelasEl.value : (localStorage.getItem('kelas') || "");
     let nilai = document.getElementById('final-score') ? document.getElementById('final-score').innerText : "";
